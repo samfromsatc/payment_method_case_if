@@ -39,7 +39,6 @@ slide_2_by_rating <- ggplot(tbl_2_by_rating, aes(Rating, Andel)) +
         axis.title = element_blank(),
         panel.grid.major.y = element_line(color = "grey"))
 
-
 tbl_3_cube_rating <- imp %>% 
   select(cube_level, customers, FeatureInvestigated) %>% 
   group_by(FeatureInvestigated, cube_level) %>% 
@@ -53,20 +52,26 @@ tbl_3_cube_rating <- imp %>%
   filter(!is.na(cube_level)) %>% 
   pivot_wider(names_from = HasPaymentType, values_from = Andel)
 
-
 #skrota denna? ta ett snitt bara. kanske räkna antal försäkringar bara. totalt. 
-ggplot(tbl_3_cube_rating %>% mutate(No = -No), aes(x = cube_level)) +
+slide_3_cube_rating <- ggplot(tbl_3_cube_rating %>% mutate(No = -No), aes(x = cube_level)) +
   geom_bar(aes(y = No), stat = "identity", fill = colors[["purple"]]) +
   geom_bar(aes(y = Yes), stat = "identity", fill = colors[["red"]]) +
-  coord_flip()
+  coord_flip() +
+  scale_y_continuous(labels = abs) +
+  theme(panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey"),
+        axis.ticks = element_blank())+
+  labs(x = "", y = "Cube level")
 
-# tbl_3_cube_rating_exp <- tbl_3_cube_rating[rep(1:nrow(tbl_3_cube_rating), tbl_3_cube_rating$customers), 1:ncol(tbl_3_cube_rating)] %>% 
-#   filter(!is.na(cube_level)) 
 
-
+contact <- imp %>% 
+  group_by(FeatureInvestigated) %>% 
+  summarize(`AndelMedEmail` = 100*mean(contact_info_edm, na.rm = TRUE),
+            `AndelMedTelefon` = 100*mean(contact_info_tm, na.rm = TRUE))
   
 
 
 
-
-
+# users of this method are older, show signs of being less technically proficient, probably difficult to change method
+# they are lucrative and cheap and we might want to keep them
+# they may not find it easy to change and we might lose their business or goodwill at least
