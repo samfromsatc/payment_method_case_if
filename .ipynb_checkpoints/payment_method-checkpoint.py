@@ -4,7 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import matplotlib.font_manager as fm
-from plotnine import ggplot, aes, geom_line, geom_bar, theme, element_blank, element_line, element_text, coord_flip, scale_y_continuous, labs
+from plotnine import ggplot, aes, geom_line, geom_bar, theme, element_blank, element_line, element_text
 
 colors = mcolors.TABLEAU_COLORS
 
@@ -59,14 +59,13 @@ by_rating_df = (
     .assign(Andel = lambda x: x.groupby('Rating')['Antal'].transform(lambda y:100*y/y.sum()))
     .query('FeatureInvestigated == 1')
     .assign(Rating = lambda x:pd.Categorical(x['Rating'],
-                                             categories=['Missing', 'Ok', 'Good', 'Star']))
+                                             categories=['Missing', 'OK', 'Good', 'Star']))
 )
 
 plt_rating = (ggplot(by_rating_df) +
               aes(x='Rating', y='Andel') + 
               geom_bar(stat = 'identity', fill = colors['tab:purple']) +
-              custom_theme() +
-              labs(x='Andel i %')
+              custom_theme()
 
 )
 
@@ -75,27 +74,9 @@ print(plt_rating)
 # slide 3: cube rating bland användare och övriga
 
 cube_rating_df = (
-    grunddata.groupby(['Användare', 'cube_level'])
-    .agg(Antal = ('customers', 'sum'))
-    .reset_index()
-    .assign(Andel = lambda x: x.groupby('Användare')['Antal'].transform(lambda y: 100*y/y.sum()))
-    .pivot(index='cube_level', columns = 'Användare', values = 'Andel')
-    .reset_index()
-    .assign(Övriga = lambda x: x['Övriga']*-1,
-            cube_level = lambda x: pd.Categorical(x['cube_level'],
-                                                  categories=['?', '0', '1', '2', '3']))
-    )
+    grunddata.query('cube_level != "?"'))
 
-plt_rating = (ggplot(cube_rating_df) +
-              aes(x=cube_level) +
-              geom_bar(aes(y=Användare), stat='identity', fill = colors['tab:olive']) +
-              geom_bar(aes(y=Övriga), stat='identity', fill = colors['tab:pink']) +
-              coord_flip() +
-              scale_y_continuous(labels=abs) +
-              custom_theme()
-)
-
-print(plt_rating)
+print(cube_rating_df)
 
 """available_fonts = fm.findSystemFonts(fontpaths=None, fontext='ttf')
 print(available_fonts)"""
