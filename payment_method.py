@@ -66,7 +66,7 @@ plt_rating = (ggplot(by_rating_df) +
               aes(x='Rating', y='Andel') + 
               geom_bar(stat = 'identity', fill = colors['tab:purple']) +
               custom_theme() +
-              labs(x='Andel i %')
+              labs(y='Andel i %')
 
 )
 
@@ -79,23 +79,23 @@ cube_rating_df = (
     .agg(Antal = ('customers', 'sum'))
     .reset_index()
     .assign(Andel = lambda x: x.groupby('Användare')['Antal'].transform(lambda y: 100*y/y.sum()))
-    .pivot(index='cube_level', columns = 'Användare', values = 'Andel')
+    """.pivot(index='cube_level', columns = 'Användare', values = 'Andel')
     .reset_index()
     .assign(Övriga = lambda x: x['Övriga']*-1,
             cube_level = lambda x: pd.Categorical(x['cube_level'],
-                                                  categories=['?', '0', '1', '2', '3']))
+                                                  categories=['?', 0, 1, 2, 3]))"""
     )
 
-plt_rating = (ggplot(cube_rating_df) +
+"""plt_rating = (ggplot(cube_rating_df) +
               aes(x=cube_level) +
               geom_bar(aes(y=Användare), stat='identity', fill = colors['tab:olive']) +
               geom_bar(aes(y=Övriga), stat='identity', fill = colors['tab:pink']) +
               coord_flip() +
               scale_y_continuous(labels=abs) +
               custom_theme()
-)
+)"""
 
-print(plt_rating)
+print(cube_rating_df)
 
 """available_fonts = fm.findSystemFonts(fontpaths=None, fontext='ttf')
 print(available_fonts)"""
