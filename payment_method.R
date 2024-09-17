@@ -9,7 +9,7 @@ imp <- openxlsx::read.xlsx("PaymentCaseFromFinland_data.xlsx") %>%
 count(imp, across(-customers)) %>% count(n) # ja det finns bara en rad per kombination av de andra kolumnerna?
 
 grunddata <- imp %>% 
-  mutate(Users = ifelse(FeatureInvestigated == 1, 'Användare', 'Övriga'))
+  mutate(Users = ifelse(FeatureInvestigated == 1, 'Anv?ndare', '?vriga'))
 
 colors <- c(red = "#ea5545", pink = '#f46a9b', '#ef9b20', '#edbf33', '#ede15b', '#bdcf32', '#87bc45', blue='#27aeef', purple = '#b33dc6')
 
@@ -102,7 +102,7 @@ tbl_5_duration <- grunddata %>%
            stringr::str_replace_all("to", "till ") %>% 
            stringr::str_squish() %>% 
            factor(levels = c("0", "1", "2", "3", "4", "5 till 6", "7 till 9", "10 till 14", "15 till 19", "20 till 29", "30+", "Missing"))) %>% 
-  filter(Användare == 'Användare')
+  filter(Anv?ndare == 'Anv?ndare')
 
 slide_5_duration <- ggplot(tbl_5_duration, aes(x = DurationClass, y = Andel)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.2), fill = colors[["blue"]]) +
@@ -112,7 +112,10 @@ slide_5_duration <- ggplot(tbl_5_duration, aes(x = DurationClass, y = Andel)) +
 
 
 grunddata %>% 
-  filter(FeatureInvestigated==1) %>% 
-  group_by(AgeClass) %>% 
-  summarize(Antal = sum(customers)) %>% 
-  mutate(Andel = 100*Antal/sum(Antal))
+  filter(FeatureInvestigated == 1) %>% 
+  mutate(across(c(product1, product2, product3, product4),
+                function(x) ifelse(x>0, 1, 0), .names = "{col}_binary")) %>% 
+  mutate(across(c(product1, product2, product3, product4, product1_binary, product2_binary, product3_binary, product4_binary), function(x) x*customers)) %>% 
+  
+  
+ 
